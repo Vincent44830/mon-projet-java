@@ -11,5 +11,10 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
+        stage('execution') {
+            steps {
+                sh 'java -jar target/mon-projet-java-1.0-SNAPSHOT.jar'
+            }
+        }
     }
 }
