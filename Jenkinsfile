@@ -6,15 +6,28 @@ pipeline {
     }
 
     environment {
-        IMG="mon-projet-java:${env.BUILD_NUMBER}"
+        IMG="mon-projet-java-mathieu:${env.BUILD_NUMBER}"
         CT_NAME="mon-projet-java-vincent-container"
-        URL_NOTIFICATION="https://ntfy.sh/e6ImUuMlv84zmQdE"
+        URL_NOTIFICATIONS="https://ntfy.sh/e6ImUuMlv84zmQdE"
+        SONAR_PRJ_KEY="projet-mathieu"
     }
 
     stages {
-        stage('Compilation') {
+        stage('Compilation du projet') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean verify'
+            }
+        }
+
+        stage('Analyse sonar') {
+            steps {
+                withSonarQubeEnv('sonar-cube-sncf') {
+                    sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=${SONAR_PRJ_KEY} \
+                    -Dsonar.projectName=${SONAR_PRJ_KEY}
+                    """
+                }
             }
         }
 
@@ -32,7 +45,6 @@ pipeline {
             }
         }
     }
-
 
     post {
         success {
@@ -62,3 +74,4 @@ pipeline {
         }
     }
 }
+ 
